@@ -1,0 +1,14 @@
+
+#Opened a deck for the project
+#And I can save here examples of code
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"  #Example base box
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"  #Optional: Allocate memory to the VM
+  end
+end
+
+# This configuration tells Vagrant to use VirtualBox 
+# as the provider for the virtual machine and sets 
+# the memory allocation to 1024MB.
