@@ -1,0 +1,30 @@
+Vagrant.configure("2") do |config|
+  # Указываем образ, например, Ubuntu 22.04
+  config.vm.box = "ubuntu/jammy64"
+
+  # Первая машина (контроллер)
+  config.vm.define "wilS" do |wilS|
+    wilS.vm.hostname = "wilS"
+    wilS.vm.network "private_network", ip: "192.168.56.110"
+    wilS.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+    wilS.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | sh -
+    SHELL
+  end
+
+  # Вторая машина (агент)
+  config.vm.define "wilSW" do |wilSW|
+    wilSW.vm.hostname = "wilSW"
+    wilSW.vm.network "private_network", ip: "192.168.56.111"
+    wilSW.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+    wilSW.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="SECRET_TOKEN" sh -
+    SHELL
+  end
+end
