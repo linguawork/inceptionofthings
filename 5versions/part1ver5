@@ -1,0 +1,136 @@
+
+#В приведенном вами Vagrantfile есть несколько важных аспектов, которые следует уточнить и дополнить для того, чтобы он соответствовал требованиям вашей задачи. Рассмотрим, что из требуемых установок уже учтено, и что нужно доработать.
+#Два хоста: сервер и рабочая машина.
+#IP-адреса:
+#Установка K3s:
+#На первой машине (Server) — установка в режиме контроллера.
+#На второй машине (ServerWorker) — установка в режиме агента.
+#Установка kubectl на обеих машинах.
+#SSH-доступ без пароля.
+#Название машин: хост для первой машины должен быть wilS, для второй — wilSW.
+
+#Разбор вашего Vagrantfile:
+#Ваша структура Vagrantfile выглядит так:
+Vagrant.configure(2) do |config|
+  # Настройка для первого хоста (Server)
+  config.vm.define "wilS" do |control|
+    control.vm.hostname = "wilS"
+    control.vm.network REDACTED, ip: "192.168.56.110"
+    control.vm.provider REDACTED do |v|
+      v.customize ["modifyvm", :id, "--name", "wilS"]
+    end
+    # Здесь должно быть добавлено привязка ресурсов, например, памяти и CPU
+    control.vm.provision :shell, :inline => SHELL
+    control.vm.provision "shell", path: REDACTED
+  end
+
+  # Настройка для второго хоста (ServerWorker)
+  config.vm.define "wilSW" do |control|
+    control.vm.hostname = "wilSW"
+    control.vm.network REDACTED, ip: "192.168.56.111"
+    control.vm.provider REDACTED do |v|
+      v.customize ["modifyvm", :id, "--name", "wilSW"]
+    end
+    # Здесь должно быть добавлено привязка ресурсов, например, памяти и CPU
+    control.vm.provision "shell", inline: <<-SHELL
+    [..]
+    SHELL
+    control.vm.provision "shell", path: REDACTED
+  end
+end
+
+Что нужно исправить или дополнить:
+Настройка сети (IP-адреса):
+Нужно указать настройки сети для каждой виртуальной машины и задать статический IP. В вашем случае это IP 192.168.56.110 для wilS (Server) и 192.168.56.111 для wilSW (ServerWorker).
+Пример:
+config.vm.define "wilS" do |control|
+  control.vm.network "private_network", ip: "192.168.56.110"
+  # Остальная конфигурация
+end
+config.vm.define "wilSW" do |control|
+  control.vm.network "private_network", ip: "192.168.56.111"
+  # Остальная конфигурация
+end
+
+Установка K3s:
+Вам нужно добавить provisioner shell для автоматической установки K3s на обе машины.
+Для wilS нужно установить K3s в режиме контроллера.
+Для wilSW — K3s в режиме агента, который будет подключаться к wilS.
+Пример установки на сервер:
+control.vm.provision "shell", inline: <<-SHELL
+  curl -sfL https://get.k3s.io | sh -
+SHELL
+Пример установки на рабочую машину (ServerWorker):
+control.vm.provision "shell", inline: <<-SHELL
+  export K3S_URL=https://192.168.56.110:6443
+  export K3S_TOKEN=$(ssh vagrant@192.168.56.110 "sudo cat /var/lib/rancher/k3s/server/node-token")
+  curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+SHELL
+Установка kubectl:
+Вы должны установить kubectl на обе машины, чтобы можно было управлять кластером.
+Пример установки kubectl:
+control.vm.provision "shell", inline: <<-SHELL
+  curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+  chmod +x ./kubectl
+  sudo mv ./kubectl /usr/local/bin/kubectl
+SHELL
+Настройка SSH без пароля:
+Vagrant автоматически настраивает SSH-ключи для подключения между хостом и виртуальными машинами. Однако, вам нужно удостовериться, что настройки SSH корректно пропишутся и будут использоваться без пароля. Это должно работать по умолчанию с vagrant ssh.
+Привязка ресурсов:
+Заданы ли минимальные ресурсы (1 CPU и 512 MB RAM)? В вашем Vagrantfile это не указано, но вам нужно будет это добавить.
+Пример:
+control.vm.provider "virtualbox" do |vb|
+  vb.memory = "512MB"
+  vb.cpus = 1
+end
+Дополнительные команды:
+Вы можете настроить дополнительные provisioners для установки дополнительных пакетов или конфигураций, которые могут понадобиться в процессе работы с K3s или kubectl.
+Окончательный пример Vagrantfile с учетом всех требований:
+Vagrant.configure("2") do |config|
+  # Настройка для первого хоста (Server)
+  config.vm.define "wilS" do |control|
+    control.vm.hostname = "wilS"
+    control.vm.network "private_network", ip: "192.168.56.110"
+    control.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"
+      vb.cpus = 1
+      vb.name = "wilS"
+    end
+    # Установка K3s на сервер (контроллер)
+    control.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | sh -
+      
+      # Установка kubectl
+      curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/kubectl
+    SHELL
+  end
+
+  # Настройка для второго хоста (ServerWorker)
+  config.vm.define "wilSW" do |control|
+    control.vm.hostname = "wilSW"
+    control.vm.network "private_network", ip: "192.168.56.111"
+    control.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"
+      vb.cpus = 1
+      vb.name = "wilSW"
+    end
+    # Установка K3s на агент (подключение к контроллеру)
+    control.vm.provision "shell", inline: <<-SHELL
+      export K3S_URL=https://192.168.56.110:6443
+      export K3S_TOKEN=$(ssh vagrant@192.168.56.110 "sudo cat /var/lib/rancher/k3s/server/node-token")
+      curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+      
+      # Установка kubectl
+      curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/kubectl
+    SHELL
+  end
+end
+Резюме:
+Да, в вашем примере Vagrantfile не учтены все требования задачи. Вам нужно будет добавить установку K3s и kubectl на обе машины, а также настройки для статических IP-адресов и минимальных ресурсов.
+Приведенный выше пример включает все необходимые настройки для выполнения задачи.
+
+

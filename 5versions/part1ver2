@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+  # Создание первой виртуальной машины (Server)
+  config.vm.define "Server" do |server|
+    server.vm.box = "ubuntu/bionic64" # используем Ubuntu как пример
+    server.vm.network "private_network", type: "dhcp", adapter: 1
+    server.vm.network "private_network", ip: "192.168.56.110", virtualbox__intnet: "intnet"
+    server.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"  # Задаем минимальные ресурсы
+      vb.cpus = 1
+    end
+  end
+
+  # Создание второй виртуальной машины (ServerWorker)
+  config.vm.define "ServerWorker" do |worker|
+    worker.vm.box = "ubuntu/bionic64"
+    worker.vm.network "private_network", type: "dhcp", adapter: 1
+    worker.vm.network "private_network", ip: "192.168.56.111", virtualbox__intnet: "intnet"
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"  # Задаем минимальные ресурсы
+      vb.cpus = 1
+    end
+  end
+end

@@ -1,0 +1,57 @@
+Vagrant.configure("2") do |config|
+  # Define the first virtual machine (Server)
+  config.vm.define "areggieS" do |server|
+    server.vm.hostname = "areggieS"
+    server.vm.box = "ubuntu/jammy64"  # Using the latest stable Ubuntu version
+    
+    # Setting the network configurations for the server
+    server.vm.network "private_network", ip: "192.168.56.110", virtualbox__intnet: "intnet"  # Internal network configuration
+    
+    # Setting minimal resources
+    server.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024MB"  # 1 GB of RAM (could also be 512MB if you need less)
+      vb.cpus = 1
+    end
+
+    # Provisioning: Install K3s on the first machine (Server) in controller mode
+    server.vm.provision "shell", inline: <<-SHELL
+      # Install K3s (Controller Mode)
+      curl -sfL https://get.k3s.io | sh -
+
+      # Install kubectl
+      curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/kubectl
+    SHELL
+  end
+
+  # Define the second virtual machine (ServerWorker)
+  config.vm.define "areggieSW" do |worker|
+    worker.vm.hostname = "areggieSW"
+    worker.vm.box = "ubuntu/jammy64"  # Using the latest stable Ubuntu version
+    
+    # Setting the network configurations for the worker machine
+    worker.vm.network "private_network", ip: "192.168.56.111", virtualbox__intnet: "intnet"  # Internal network configuration
+
+    # Setting minimal resources
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024MB"  # 1 GB of RAM (could also be 512MB if you need less)
+      vb.cpus = 1
+    end
+
+    # Provisioning: Install K3s on the second machine (ServerWorker) in agent mode
+    worker.vm.provision "shell", inline: <<-SHELL
+      # Fetch the K3s token from the controller (first machine)
+      export K3S_URL=https://192.168.56.110:6443
+      export K3S_TOKEN=$(ssh vagrant@192.168.56.110 "sudo cat /var/lib/rancher/k3s/server/node-token")
+      
+      # Install K3s (Agent Mode)
+      curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+
+      # Install kubectl
+      curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/kubectl
+    SHELL
+  end
+end

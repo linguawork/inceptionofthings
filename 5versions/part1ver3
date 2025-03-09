@@ -1,0 +1,40 @@
+#Пример Vagrantfile с установкой K3s
+Vagrant.configure("2") do |config|
+  # Создание первой виртуальной машины (Server)
+  config.vm.define "Server" do |server|
+    server.vm.box = "ubuntu/bionic64"
+    server.vm.network "private_network", ip: "192.168.56.110"
+
+    # Настройка минимальных ресурсов
+    server.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"
+      vb.cpus = 1
+    end
+
+    # Установка K3s на сервер (контроллер)
+    server.vm.provision "shell", inline: <<-SHELL
+      curl -sfL https://get.k3s.io | sh -
+    SHELL
+  end
+
+
+
+  # Создание второй виртуальной машины (ServerWorker)
+  config.vm.define "ServerWorker" do |worker|
+    worker.vm.box = "ubuntu/bionic64"
+    worker.vm.network "private_network", ip: "192.168.56.111"
+
+    # Настройка минимальных ресурсов
+    worker.vm.provider "virtualbox" do |vb|
+      vb.memory = "512MB"
+      vb.cpus = 1
+    end
+
+    # Установка K3s на агент (подключение к контроллеру)
+    worker.vm.provision "shell", inline: <<-SHELL
+      export K3S_URL=https://192.168.56.110:6443
+      export K3S_TOKEN=$(ssh vagrant@192.168.56.110 "sudo cat /var/lib/rancher/k3s/server/node-token")
+      curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
+    SHELL
+  end
+end
