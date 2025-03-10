@@ -1,3 +1,4 @@
+#Here’s a Vagrantfile that fully meets your requirements:
 Vagrant.configure("2") do |config|
     # Define the first virtual machine (Server)
     config.vm.define "areggieS" do |server|
@@ -15,6 +16,12 @@ Vagrant.configure("2") do |config|
       server.vm.provision "shell", inline: <<-SHELL
         # Install K3s (Controller Mode)
         curl -sfL https://get.k3s.io | sh -
+  
+        # Install kubectl
+        # kubectl can be insde k3s by default!!!
+        curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
       SHELL
     end
   
@@ -37,6 +44,7 @@ Vagrant.configure("2") do |config|
         #added messages to console with echo
         echo "Fetching K3s token from server"
         export K3S_URL=https://192.168.56.110:6443
+        #export K3S_TOKEN=$(ssh vagrant@192.168.56.110 "sudo cat /var/lib/rancher/k3s/server/node-token")
         export K3S_TOKEN=$(vagrant ssh -c "sudo cat /var/lib/rancher/k3s/server/node-token" 2>/dev/null)
 
         echo "K3S_URL is $K3S_URL"
@@ -44,12 +52,12 @@ Vagrant.configure("2") do |config|
         
         # Install K3s (Agent Mode)
         curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
-        
-        # Set KUBECONFIG to point to the K3s config file
-        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-        
-        # Verify kubectl can access the cluster (optional, just to check)
-        kubectl get nodes
+  
+        # Install kubectl
+        curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
       SHELL
     end
-end
+  end
+  
