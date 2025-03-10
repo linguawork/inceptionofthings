@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
       
       # Setting minimal resources
       server.vm.provider "virtualbox" do |vb|
-        vb.memory = "512MB"  # 1 GB of RAM (could also be 512MB if you need less)
+        vb.memory = "512"  # 1 GB of RAM (could also be 512MB if you need less)
         vb.cpus = 1
       end
   
@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
       
       # Setting minimal resources
       worker.vm.provider "virtualbox" do |vb|
-        vb.memory = "512MB"  # 1 GB of RAM (could also be 512MB if you need less)
+        vb.memory = "512"  # 1 GB of RAM (could also be 512MB if you need less)
         vb.cpus = 1
       end
   
