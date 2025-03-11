@@ -1,53 +1,25 @@
 Vagrant.configure("2") do |config|
-  # Define the first virtual machine (Server)
   config.vm.define "areggieS" do |server|
-    server.vm.hostname = "areggieS"
     server.vm.box = "ubuntu/jammy64"
+    server.vm.hostname = "areggieS"
     server.vm.network "private_network", ip: "192.168.56.110"
-    
     server.vm.provider "virtualbox" do |vb|
-      vb.memory = "512"
-      vb.cpus = 1
+      vb.memory = 2048
+      vb.cpus = 2
     end
+    server.vm.provision "shell", path: "scripts/server.sh"
+   end
 
-    server.vm.provision "shell", inline: <<-SHELL
-      curl -sfL https://get.k3s.io | sh -
-      cat /var/lib/rancher/k3s/server/node-token > /vagrant/k3s_token.txt
-    SHELL
-  end
-
-  # Define the second virtual machine (ServerWorker)
   config.vm.define "areggieSW" do |worker|
-    worker.vm.hostname = "areggieSW"
     worker.vm.box = "ubuntu/jammy64"
+    worker.vm.hostname = "areggieSW"
     worker.vm.network "private_network", ip: "192.168.56.111"
-    
     worker.vm.provider "virtualbox" do |vb|
-      vb.memory = "512"
-      vb.cpus = 1
+      vb.memory = 2048
+      vb.cpus = 2
     end
-
-    worker.vm.provision "shell", inline: <<-SHELL
-      echo "Fetching K3s token from server"
-      export K3S_URL=https://192.168.56.110:6443
-      
-      # Wait until the server is ready
-      while ! nc -z 192.168.56.110 6443; do
-        sleep 1
-      done
-
-      export K3S_TOKEN=$(cat /vagrant/k3s_token.txt)
-      echo "K3S_URL is $K3S_URL"
-      echo "K3S_TOKEN is $K3S_TOKEN"
-      
-      # Install K3s in agent mode
-      curl -sfL https://get.k3s.io | K3S_URL=$K3S_URL K3S_TOKEN=$K3S_TOKEN sh -
-      
-      # Set KUBECONFIG
-      export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-      
-      # Verify kubectl can access the cluster
-      kubectl get nodes
-    SHELL
+    worker.vm.provision "shell", path: "scripts/worker.sh"
   end
 end
+
+
