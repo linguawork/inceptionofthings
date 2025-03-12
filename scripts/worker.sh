@@ -36,12 +36,12 @@ fi
 
 # Copy Kubeconfig from master node (areggieS)
 #the -o StrictHostKeyChecking=no option  to bypass the SSH key check during the scp command
-echo -e "${GREEN}Copying kubeconfig from master node...${RESET}"
-if scp -o StrictHostKeyChecking=no vagrant@192.168.56.110:/etc/rancher/k3s/k3s.yaml ~/.kube/config; then
-    echo -e "${GREEN}Kubeconfig copied successfully.${RESET}"
-else
-    echo -e "${RED}Failed to copy kubeconfig.${RESET}"
-fi
+#echo -e "${GREEN}Copying kubeconfig from master node...${RESET}"
+#if scp -o StrictHostKeyChecking=no vagrant@192.168.56.110:/etc/rancher/k3s/k3s.yaml ~/.kube/config; then
+#    echo -e "${GREEN}Kubeconfig copied successfully.${RESET}"
+#else
+#    echo -e "${RED}Failed to copy kubeconfig.${RESET}"
+#fi
 
 
 # We delete the token for security, and also so that when restarting, a new token is used and not the previously created one
