@@ -2,7 +2,7 @@
 
 
 /*
-в папке 5 файлов, версий vagrantfile
+    в папке several файлов, версий vagrantfile
+    Version 9 worked on school computer in VM
 
-но только один создан в соответствии с заданием
 */
