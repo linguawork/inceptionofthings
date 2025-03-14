@@ -4,13 +4,10 @@ Vagrant.configure("2") do |config|
     server.vm.hostname = "areggieS"
     server.vm.network "private_network", ip: "192.168.56.110"
     server.vm.provider "virtualbox" do |vb|
-      #vb.name = "areggie"
       vb.memory = 1024
       vb.cpus = 1
-
       # Change the name of the virtual machine
       vb.customize ['modifyvm', :id, "--name", "areggieS"]
-
     end
     server.vm.provision "shell", path: "scripts/server.sh"
    end

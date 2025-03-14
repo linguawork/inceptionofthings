@@ -36,37 +36,8 @@ fi
 
 
 
-
-#Copy Kubeconfig from master node (areggieS)
-#the -o StrictHostKeyChecking=no option  to bypass the SSH key check during the scp command
-#echo -e "${GREEN}Copying kubeconfig from master node...${RESET}"
-#if scp -o StrictHostKeyChecking=no vagrant@192.168.56.110:/etc/rancher/k3s/k3s.yaml ~/.kube/config; then
-#    echo -e "${GREEN}Kubeconfig copied successfully.${RESET}"
-#else
-#    echo -e "${RED}Failed to copy kubeconfig.${RESET}"
-#fi
-
-
-
 # We delete the token for security, and also so that when restarting, a new token is used and not the previously created one
 sudo rm /vagrant/token.env
 
 
 
-# Modify GRUB configuration to disable predictable network names
-echo "GRUB_CMDLINE_LINUX_DEFAULT=\"net.ifnames=0 biosdevname=0\"" | sudo tee -a /etc/default/grub
-
-# Update GRUB
-if sudo update-grub; then
-    echo -e "${GREEN}GRUB update SUCCESSFUL${RESET}"
-else
-    echo -e "${RED}GRUB update FAILED${RESET}"
-    exit 1
-fi
-
-# Reboot the VM to apply changes
-echo -e "${GREEN}Rebooting VM to apply changes...${RESET}"
-sudo reboot
-
-# Wait for the system to reboot before continuing (you can put some delay or condition to wait until it's back)
-# In Vagrant provisioning, a reboot will cause the process to terminate and restart, so we don't need to manually wait here.
