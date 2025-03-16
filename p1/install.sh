@@ -73,4 +73,15 @@ sudo systemctl status vboxdrv
 echo "Verifying installations..."
 virtualbox --help 
 
+# Installing net-tools for ifconfig
+echo "Installing net-tools"
+sudo apt install net-tools
+
+# Installing git
+echo "Installing git
+sudo apt install git -y
+
+#add installing OPENSSH
+#add installing CODIUM
+
 echo "Installation completed successfully."
