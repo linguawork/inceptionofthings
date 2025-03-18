@@ -14,23 +14,10 @@ RESET="\033[0m"
 
 
 
-if curl -sfL https://get.k3s.io | sh -; then
-    echo -e "${GREEN}K3s MASTER installation SUCCEEDED${RESET}"
-else
-    echo -e "${RED}K3s MASTER installation FAILED${RESET}"
-fi
-
 # Greet user 
 echo "Hi there, areggie decided to run all the installations via bash script, 
-we will install Vagrant, VB etc on Ubuntu JellyFish. "
-sleep 2
+we will install Vagrant, VB, net-tools, git, codium, openssh etc on Ubuntu JellyFish. "
 
-echo "Add user to sudo group"
-if su && adduser $USER sudo && exit && sleep 5 ; then
-    echo -e "${GREEN}Adding user to sudo group was SUCCESSFUL${RESET}"
-else
-    echo -e "${RED}Adding user to sudo group FAILED${RESET}"
-fi
 
 
 # Update package lists
