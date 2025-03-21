@@ -42,11 +42,12 @@ else
     echo -e "${RED}K3s MASTER installation FAILED${RESET}"
 fi
 
-# Copying the Vagrant token to the mounted shared synced folder, which will be necessary to install the worker
-# https://docs.k3s.io/quick-start
 # To understand the K3s architecture:
 # https://docs.k3s.io/architecture
+# Copying the Vagrant token to the mounted shared synced folder, which will be necessary to install the worker
+# https://docs.k3s.io/quick-start
 
+#папка проекта на хосте с таким же содержимым как на VM (cd to /vagrant)
 if sudo cat /var/lib/rancher/k3s/server/token >> /vagrant/token.env; then
     echo -e "${GREEN}TOKEN SUCCESSFULLY SAVED${RESET}"
 else

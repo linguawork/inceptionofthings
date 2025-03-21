@@ -9,6 +9,13 @@ RESET="\033[0m"
 # �reating an environment variable for installing the worker node
 # https://docs.k3s.io/installation/configuration#configuration-file
 
+#agent: This tells K3s that you want to install it as a worker node (also called an agent), not as a server (master).
+#--server https://192.168.56.110:6443: Specifies the address of the master/server node where the worker should connect.
+#-t $(cat /vagrant/token.env): The -t option means token. It’s providing the join token required for the worker to securely connect to the master.
+# $(cat /vagrant/token.env) dynamically reads the token from the file /vagrant/token.env, which was previously copied by the master/server node.
+# /vagrant is the synced folder, meaning it’s shared between host and VM, so the worker VM can access it.
+# --node-ip=192.168.56.111: Sets the worker’s IP address explicitly.
+
 if export INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 -t $(cat /vagrant/token.env) --node-ip=192.168.56.111"; then
         echo -e "${GREEN}export INSTALL_K3S_EXEC SUCCEEDED${RESET}"
 else
