@@ -1,13 +1,31 @@
 #!/bin/bash
 
 # Set the colors for displaying information in the terminal
-
 GREEN="\033[32m"
 RED="\033[31m"
 RESET="\033[0m"
 
 # Creating an environment variable for installing the master node
 # https://docs.k3s.io/installation/configuration#configuration-file
+
+
+# --write-kubeconfig-mode=644	
+# Настраивает права доступа к kubeconfig-файлу (по умолчанию он доступен только root, а с этим параметром доступен всем пользователям для чтения).
+# Это полезно для того, чтобы ты мог подключаться к кластеру под обычным пользователем без лишних прав.
+
+#--tls-san serverS	
+# Добавляет дополнительное имя (Subject Alternative Name) к TLS сертификатам. Здесь это hostname serverS. Это нужно для того, чтобы можно было обращаться к серверу по имени serverS, а не только по IP. Особенно полезно, если у тебя несколько IP/имён.
+
+#--node-ip=192.168.56.110	
+# Явно указывает IP-адрес ноды. Это важно, если у машины несколько сетевых интерфейсов, и ты хочешь использовать конкретный IP для связи. В твоём случае — это приватный IP машины в сети Vagrant.
+
+# --bind-address=192.168.56.110	
+# Указывает IP-адрес, на котором K3s будет слушать входящие соединения API-сервера. Это тот же IP, что и выше — 192.168.56.110.
+
+# --advertise-address=192.168.56.110	
+# Это IP-адрес, который мастер-нод будет «рекламировать» другим нодам кластера (worker-нодам). То есть другие ноды узнают, как подключиться к мастеру.
+
+
 
 if export INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san serverS --node-ip 192.168.56.110 --bind-address=192.168.56.110 --advertise-address=192.168.56.110 "; then
     echo -e "${GREEN}export INSTALL_K3S_EXEC SUCCEEDED${RESET}"
