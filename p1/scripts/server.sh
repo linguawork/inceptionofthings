@@ -9,6 +9,8 @@ RESET="\033[0m"
 # https://docs.k3s.io/installation/configuration#configuration-file
 
 
+#FLAGS: https://docs.k3s.io/cli/server (flags for server)
+#FLAGS: https://docs.k3s.io/cli/agent (flags for agent or worker)
 # --write-kubeconfig-mode=644	
 # Настраивает права доступа к kubeconfig-файлу (по умолчанию он доступен только root, а с этим параметром доступен всем пользователям для чтения).
 # Это полезно для того, чтобы ты мог подключаться к кластеру под обычным пользователем без лишних прав.
@@ -25,8 +27,6 @@ RESET="\033[0m"
 # --advertise-address=192.168.56.110	
 # Это IP-адрес, который мастер-нод будет «рекламировать» другим нодам кластера (worker-нодам). То есть другие ноды узнают, как подключиться к мастеру.
 
-
-
 if export INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san serverS --node-ip 192.168.56.110 --bind-address=192.168.56.110 --advertise-address=192.168.56.110 "; then
     echo -e "${GREEN}export INSTALL_K3S_EXEC SUCCEEDED${RESET}"
 else
@@ -42,8 +42,10 @@ else
     echo -e "${RED}K3s MASTER installation FAILED${RESET}"
 fi
 
-# Copying the Vagrant token to the mounted folder, which will be necessary to install the worker
+# Copying the Vagrant token to the mounted shared synced folder, which will be necessary to install the worker
 # https://docs.k3s.io/quick-start
+# To understand the K3s architecture:
+# https://docs.k3s.io/architecture
 
 if sudo cat /var/lib/rancher/k3s/server/token >> /vagrant/token.env; then
     echo -e "${GREEN}TOKEN SUCCESSFULLY SAVED${RESET}"
