@@ -1,5 +1,7 @@
-apiVersion: apps/v1
-kind: Deployment
+# apiVersion - структура данных и правила (как документ-форма по которой ведут запись): https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/
+apiVersion: apps/v1 #apps/v1 - версия формы (структуры данных и правил), здесь это название версии группы объектов, в которой есть  Deployment (Управляет созданием и обновлением Pod'ов. Определяет сколько экземпляров приложения запустить.)
+#https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
+kind: Deployment #явное указание на объект из группы объектов по одной версии
 metadata:
   name: deploy-app1
   labels:
