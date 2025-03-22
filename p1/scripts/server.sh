@@ -27,6 +27,15 @@ RESET="\033[0m"
 # --advertise-address=192.168.56.110	
 # Это IP-адрес, который мастер-нод будет «рекламировать» другим нодам кластера (worker-нодам). То есть другие ноды узнают, как подключиться к мастеру.
 
+
+#-e:
+# Enable interpretation of backslash escapes — позволяет интерпретировать спецсимволы, такие как:
+#\n — новая строка.
+#\t — табуляция.
+#\e или \033 — escape-последовательности для цветов.
+#В данном случае переменные ${GREEN} и ${RESET} обычно содержат цветовые escape-последовательности ANSI для раскрашивания текста в терминале.
+#Без -e, эти escape-последовательности отображались бы буквально.
+
 if export INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san serverS --node-ip 192.168.56.110 --bind-address=192.168.56.110 --advertise-address=192.168.56.110 "; then
     echo -e "${GREEN}export INSTALL_K3S_EXEC SUCCEEDED${RESET}"
 else
@@ -35,6 +44,10 @@ fi
 
 # Install master node
 # https://docs.k3s.io/quick-start
+
+#-s: убрать лишний вывод.
+#-f: чтобы скрипт завершился с ошибкой при проблемах загрузки.
+#-L: следовать за редиректами (например, если сайт перенаправляет на другую страницу).
 
 if curl -sfL https://get.k3s.io | sh -; then
     echo -e "${GREEN}K3s MASTER installation SUCCEEDED${RESET}"
@@ -65,4 +78,3 @@ else
 fi
 
 
-#net.ifnames=0
