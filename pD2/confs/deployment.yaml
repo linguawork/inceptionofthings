@@ -2,18 +2,29 @@
 apiVersion: apps/v1 #apps/v1 - версия формы (структуры данных и правил), здесь это название версии группы объектов, в которой есть  Deployment (Управляет созданием и обновлением Pod'ов. Определяет сколько экземпляров приложения запустить.)
 #https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/
 kind: Deployment #явное указание на объект из группы объектов по одной версии
-metadata:
-  name: deploy-app1
-  labels:
-    app: deploy-app1
-spec:
-  selector:
+metadata: #https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#metadata
+  name: deploy-app1 #личное имя объекта. name: a string that uniquely identifies this object within the current namespace (see the identifiers docs). This value is used in the path when retrieving an individual object.
+  #namespace: a namespace is a DNS compatible label that objects are subdivided into. The default namespace is 'default'. See the namespace docs for more.
+  labels: 
+    app: deploy-app1 #a map of string keys and values that can be used to organize and categorize objects (через команды, потом можно фильтровать)
+spec: #Spec: Описывает желаемое состояние объекта. https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
+      #Включает настройки, которые задал пользователь, значения по умолчанию, параметры, изменённые другими компонентами (например, scheduler).
+      #Сохраняется в стабильном хранилище (и остаётся до удаления).
+      #Если удалить spec — объект удаляется из системы.
+  selector: #Это селектор меток (labels) — критерии выбора Pod'ов, которыми управляет Deployment. https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
+    #Deployment будет контролировать только те Pod'ы, метки которых соответствуют селектору
+    #!!!Селектор должен совпадать с метками (labels), указанными в шаблоне Pod'а (template.metadata.labels).
+      #selector.matchLabels = какие Pod'ы выбирать для управления.
     matchLabels:
-      app: app1
-  template:
+      app: app1 #«Я управляю всеми Pod'ами, у которых стоит метка app: app1.»
+  #https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
+  template: #Это шаблон Pod'а, который будет использоваться для создания новых Pod'ов.
+      #template.metadata.labels = какие метки ставить на создаваемые Pod'ы.
     metadata:
       labels:
+      #!!!Селектор должен совпадать с метками (labels), указанными в шаблоне Pod'а (template.metadata.labels).
         app: app1
+        #спецификации шаблона
     spec:
       containers:
       - name: app1
@@ -23,6 +34,7 @@ spec:
         volumeMounts:
         - name: app1-volume
           mountPath: /usr/share/nginx/html
+      #https://kubernetes.io/docs/concepts/storage/volumes/
       volumes:
       - name: app1-volume
         hostPath:
@@ -36,7 +48,7 @@ metadata:
   labels:
     app: deploy-app2
 spec:
-  replicas: 3
+  replicas: 3 #number of pods to be created
   selector:
     matchLabels:
       app: app2
@@ -89,6 +101,7 @@ spec:
           path: /vagrant/rsc/app3
 
 ---
+#SERVICE objects, one for each DEPLOYMENT OBJECT
 
 apiVersion: v1
 kind: Service
@@ -131,6 +144,7 @@ spec:
       targetPort: 80
 
 ---
+#ingress: to access different web pages via one IP address
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
