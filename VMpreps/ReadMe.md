@@ -15,3 +15,5 @@ scp -P 2222 user@127....
 
 Если копируешь из гостевой машины → на хост:
 👉 scp vm_user@127.0.0.1:/remote/file ./
+
+Before running Vagrant don't forget to turn on Nested Virtualization
