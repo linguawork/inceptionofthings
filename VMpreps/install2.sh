@@ -161,7 +161,7 @@ fi
 
 
 #Installing net-tools for ifconfig
-echo "Installing net-tools"
+echo -e "${GREEN}Installing net-tools${RESET}"
 if sudo apt install net-tools ; then
     echo -e "${GREEN}Installing net-tool for ifconfig command was SUCCESSFUL${RESET}"
 else
@@ -169,15 +169,15 @@ else
 fi
 
 #Installing git
-echo "Installing git"
+echo -e "Installing git"
 if sudo apt install git -y ; then
-    echo -e "${GREEN}Installing net-tool for ifconfig command was SUCCESSFUL${RESET}"
+    echo -e "${GREEN}Installing GIT was SUCCESSFUL${RESET}"
 else
     echo -e "${RED}Installing net-tool for ifconfig command FAILED${RESET}"
 fi
 
 #Updating
-echo "Updating the package lists ..."
+echo -e "Updating the package lists ..."
 if sudo apt update ; then
     echo -e "${GREEN}Update was SUCCESSFUL${RESET}"
 else
@@ -200,13 +200,13 @@ fi
 
 
 #installing OPENSSH
-echo "Installing OPENSSH ..."
+ echo -e "${GREEN}Installing OPENSSH ...${RESET}"
 if sudo apt install openssh-server -y &&
 sudo systemctl start sshd &&
 sudo systmectl enable sshd ; then
     echo -e "${GREEN}Installing, starting OPENSSH, enabling at system start was SUCCESSFUL${RESET}"
 else
-    echo -e "${RED}Installing, starting OPENSSH, enabling at system start FAILED${RESET}"
+    echo -e "${RED}Installing, starting OPENSSH, enabling at system start WAITING NANO settings${RESET}"
 fi
 
 ps aux | grep ssh
@@ -227,11 +227,11 @@ sudo systemctl status sshd"
 echo "Restart OPENSSH and checking the status..."
 if sudo systemctl restart sshd &&
 sudo systemctl status sshd; then
-    echo -e "${GREEN}URestart OPENSSH and checking the status was SUCCESSFUL${RESET}"
+    echo -e "${GREEN}Restarted OPENSSH SUCCESSFULLY and checked the status SUCCESSFULLY${RESET}"
 else
     echo -e "${RED}Restart OPENSSH and checking the status FAILED${RESET}"
 fi
 
 
 
-echo "Installation completed successfully."
+echo -e "${GREEN}Installation completed successfully.${RESET}"
