@@ -3,7 +3,7 @@
 Vagrant.configure("2") do |config|
     #This defines a virtual machine within the Vagrant environment and allows you to manage multiple VMs separately.
     #no need to define the only one machine in the project
-    #config.vm.define "areggieS" do |server|
+    config.vm.define "areggieS" do |server|
     config.vm.box = "ubuntu/jammy64"
 
     #This sets the hostname inside the guest operating system.
@@ -28,4 +28,6 @@ Vagrant.configure("2") do |config|
       kubectl apply -f /vagrant/confs/deployment.yaml
     SHELL
      end
+    end
+
   
