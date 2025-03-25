@@ -5,6 +5,15 @@ RED="\033[31m"
 RESET="\033[0m"
 
 
+#creating cluster
+#areggieS — имя кластера.
+#--agents 2 — количество воркеров (можно оставить 1 или убрать вовсе).
+#kubectl get nodes (command to check)
+sudo k3d cluster create areggieS
+
+
+sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/crds.yaml
+
 # https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 # creating namespaces: argocd and dev
 sudo kubectl create namespace argocd && sudo kubectl create namespace dev
@@ -69,7 +78,7 @@ sudo kubectl wait --for=condition=ready --timeout=600s pod --all -n argocd
 #pod/my-pod-2 condition met
 #...
 #error: timed out waiting for the condition
-
+#RhEENiNcxQHMymAk
 
 
 
@@ -96,7 +105,7 @@ echo -n "${GREEN}ARGOCD PASSWORD : "
 #Forward порт:
 #команда выполняет перенаправление портов для доступа к сервису Argo CD, при этом вывод и ошибки перенаправляются в фоновый режим.
 #argocd localhost:8085 or argocd.mydomain.com:8085
-sudo kubectl port-forward svc/argocd-server -n argocd 8085:443 > /dev/null 2>&1 &
+sudo kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
 #kubectl port-forward — используется для перенаправления портов с локальной машины на сервис в Kubernetes.
 #svc/argocd-server — указывает на сервис argocd-server в Kubernetes, который обычно управляет доступом к UI Argo CD.
 #-n argocd — указывает пространство имён argocd, где находится сервис argocd-server.
