@@ -4,11 +4,6 @@ GREEN="\033[32m"
 RED="\033[31m"
 RESET="\033[0m"
 
-#creating cluster
-#areggieS — имя кластера.
-#--agents 2 — количество воркеров (можно оставить 1 или убрать вовсе).
-#kubectl get nodes (command to check)
-sudo k3d cluster create areggieS
 
 # https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 # creating namespaces: argocd and dev

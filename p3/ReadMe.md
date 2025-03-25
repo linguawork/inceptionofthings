@@ -6,7 +6,7 @@ run install3.sh first.
 if the soft and dependences are installed:
 
 First run:
-init.sh – инициализация кластера
+argocd.sh – деплой ArgoCD
 
 Secondly run the deploy of argo cd:
-argocd.sh – деплой ArgoCD
+init.sh – инициализация кластера

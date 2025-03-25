@@ -7,6 +7,11 @@ RESET="\033[0m"
 #install git (previously installed in the script before part1 and 2)
 #sudo apt install git
 
+#creating cluster
+#areggieS — имя кластера.
+#--agents 2 — количество воркеров (можно оставить 1 или убрать вовсе).
+#kubectl get nodes (command to check)
+sudo k3d cluster create areggieS
 
 
 # init wil-app
