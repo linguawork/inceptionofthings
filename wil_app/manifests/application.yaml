@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: wil
-        image: wil42/playground:v1
+        image: wil42/playground:v1 #tag v1 otherwise latest unstable version
         ports:
         - containerPort: 8888
 

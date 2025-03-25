@@ -2,21 +2,29 @@
 # https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/
 
 #Это ARGO CD manifest (master)
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: wil-app
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/linguawork
-    targetRevision: HEAD
-    path: manifests
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: dev
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+
+#Раздел argoproj.io/v1alpha1 описывает CRD (Custom Resource Definitions), используемые Argo CD. В частности, это API для работы с объектами Argo CD, такими как:
+  #Application → Управляет деплоями из Git
+  #AppProject → Определяет границы и политики проектов
+  #ArgoCD → Настройка самого Argo CD
+apiVersion: argoproj.io/v1alpha1 #https://argocd-operator.readthedocs.io/en/latest/reference/api.html/#argoproj.io%2fv1alpha1
+
+kind: Application #явное указание на объект из группы объектов по одной версии → Определяет, что это Argo CD Application — объект, который управляет деплоем манифестов из Git.
+metadata: 
+  name: wil-app #Имя ArgoCD-приложения.
+  namespace: argocd #Размещается в пространстве имен Argo CD.
+spec:  #Spec: Описывает желаемое состояние объекта.
+    #https://foxutech.medium.com/argo-cd-projects-and-examples-5b5c9b84cc36
+  project: default #Every application belongs to a single project. If unspecified, an application belongs to the default project, which is created automatically and by default, permits deployments from any source repo, to any cluster, and all resource Kinds. 
+  source:  #(Источник манифестов):
+    repoURL: https://github.com/linguawork/areggie #Git-репозиторий, где хранятся манифесты.
+    targetRevision: HEAD # Используется последняя версия (HEAD). Last commit
+    path: manifests #folder inside the repo, Папка внутри репозитория, где находятся файлы манифестов (deployment.yaml,
+  destination: #(Где развернуть):
+    server: https://kubernetes.default.svc #Kubernetes API-сервер, в который деплоится приложение.
+    namespace: dev #Приложение разворачивается в dev-пространстве имен.
+  syncPolicy: #(Политика синхронизации):
+    automated: # Включает автоматическое обновление.
+      prune: true #Удаляет лишние ресурсы (те, что больше не определены в Git).
+      selfHeal: true #Самоисправление, если ресурсы в Kubernetes расходятся с Git.
+ 
