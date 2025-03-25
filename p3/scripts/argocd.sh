@@ -17,33 +17,96 @@ sudo kubectl create namespace argocd && sudo kubectl create namespace dev
 # https://argo-cd.readthedocs.io/en/stable/
 #Argo CD рекомендуется ставить в namespace argocd:
 #kubectl get pods -n argocd (command to check)
+#команда для развёртывания Argo CD в Kubernetes.
+#Скачивает манифест install.yaml с GitHub-репозитория Argo CD.
+#Применяет этот манифест в Kubernetes в пространстве имён argocd.
+#Разворачивает все необходимые ресурсы Argo CD (Deployment, Service, ConfigMap и т. д.).
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+#-n argocd (--namespace argocd)
+#Указывает, что манифест будет применён в пространстве имён argocd.
+#Если пространство имён не существует, команда может не сработать (нужно создать его заранее: kubectl create namespace argocd).
+#-f <file> (--filename <file>)
+#Определяет путь к YAML-файлу манифеста Kubernetes.
+#В данном случае, kubectl apply скачивает YAML-файл напрямую из GitHub и применяет его.
+    #После установки можно проверить статус командами:
+      #kubectl get pods -n argocd
+      #или
+      #kubectl get svc -n argocd
+
+#После установки Argo CD UI можно будет открыть через порт-форвардинг:
+#kubectl port-forward svc/argocd-server -n argocd 8080:443
+#И затем зайти в браузере: https://localhost:8080
 
 
-# adding entry to  etc/host 
+
+
+
+
+
+#adding entry to  etc/host 
 #Открывай в браузере: https://localhost:8080
 HOST_ENTRY="127.0.0.1 argocd.mydomain.com"
 HOSTS_FILE="/etc/hosts"
 
+
+#-q (--quiet) — тихий режим, при котором grep не выводит результат в консоль.
+# Он только проверяет, есть ли совпадение, и возвращает код выхода (0 = найдено, 1 = не найдено).
 if grep -q "$HOST_ENTRY" "$HOSTS_FILE"; then
     echo "exist $HOSTS_FILE"
 else
     echo "adding $HOSTS_FILE"
     echo "$HOST_ENTRY" | sudo tee -a "$HOSTS_FILE"
 fi
+#-a (--append) — добавляет (append) текст в конец файла вместо перезаписи.
+#Без -a, tee перезаписал бы весь файл, удалив существующие строки.
+
+
+
 
 # waitpod
-sudo kubectl wait --for=condition=ready --timeout=600s pod --all -n argocd
+#Ожидает, пока все поды в пространстве имён argocd не будут в состоянии ready.
+#Время ожидания ограничено 600 секунд (10 минутами).
+#Если все поды не станут готовы за это время, команда завершится с ошибкой.
 
-# password to argocd (user: admin)
-#Логин по умолчанию:
+sudo kubectl wait --for=condition=ready --timeout=600s pod --all -n argocd
+#в случае готовности
+#pod/my-pod-1 condition met
+#pod/my-pod-2 condition met
+#...
+#error: timed out waiting for the condition
+
+
+
+
+#password to argocd (user: admin)
+#Этот скрипт используется для получения пароля администратора Argo CD, используя секрет, который был автоматически создан при установке Argo CD в Kubernetes.
 echo -n "${GREEN}ARGOCD PASSWORD : "
   sudo kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
 echo "${RESET}"
+echo -n "${GREEN}ARGOCD PASSWORD : "
+#-n — предотвращает добавление новой строки в конце (по умолчанию echo добавляет её).
+#kubectl get secret — команда для получения секрета в Kubernetes.
+#argocd-initial-admin-secret — секрет, содержащий начальный пароль для пользователя admin Argo CD.
+#-n argocd — указывает пространство имён argocd, где размещён секрет.
+#-o jsonpath="{.data.password}" — извлекает значение поля password из секрета в формате JSON (секрет хранится в base64).
+#| base64 --decode:  Декодирует значение пароля, которое хранится в формате base64 в Kubernetes.
+#После декодирования будет отображён настоящий пароль для пользователя admin.
+#Примерный вывод: ARGOCD PASSWORD : your-decoded-password
 
 
-#Настроить Argo CD для CI/CD
+
+
+
 #Доступ к ArgoCD UI:
 #Forward порт:
+#команда выполняет перенаправление портов для доступа к сервису Argo CD, при этом вывод и ошибки перенаправляются в фоновый режим.
 #argocd localhost:8085 or argocd.mydomain.com:8085
 sudo kubectl port-forward svc/argocd-server -n argocd 8085:443 > /dev/null 2>&1 &
+#kubectl port-forward — используется для перенаправления портов с локальной машины на сервис в Kubernetes.
+#svc/argocd-server — указывает на сервис argocd-server в Kubernetes, который обычно управляет доступом к UI Argo CD.
+#-n argocd — указывает пространство имён argocd, где находится сервис argocd-server.
+#8085:443 — локальный порт 8085 будет перенаправлен на порт 443 сервиса (порт HTTPS).
+#> /dev/null 2>&1
+#> /dev/null — перенаправляет стандартный вывод (stdout) в /dev/null, то есть скрывает его (не будет выводиться информация о процессе).
+#2>&1 — перенаправляет ошибки (stderr) в тот же поток, что и стандартный вывод (в данном случае в /dev/null), так что ошибки также не будут выводиться
+#& — запускает команду в фоновом режиме. Это позволяет командной строке сразу вернуть контроль, не дожидаясь завершения выполнения команды.
