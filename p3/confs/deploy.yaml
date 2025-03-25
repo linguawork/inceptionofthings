@@ -1,5 +1,7 @@
 # https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
 # https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/
+
+#Это ARGO CD manifest (master)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -8,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/SavchenkoDV/buthor.git
+    repoURL: https://github.com/linguawork
     targetRevision: HEAD
     path: manifests
   destination:
