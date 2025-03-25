@@ -12,8 +12,10 @@ RESET="\033[0m"
 
 
 # Greet user 
-echo "Hi there, areggie decided to run all the installations of software via bash script for part 3."
-
+#\e или \033 — escape-последовательности для цветов.
+echo -e "${YELLOW}Hi there, areggie decided to run all the installations of software \
+ via bash script for part 3 of IoT. \
+ The script to install dependencies, Docker, K3D, Kubectl, optionally helm ${RESET}"
 
 
 # Update package lists
@@ -47,6 +49,11 @@ echo -e "${YELLOW}3 Adding Docker GPG Key, Adding Official Docker Repository, \
 # но я решил хранить в своей
 # так как папка уже создана в install.sh поэтому опустим: sudo mkdir -p /usr/share/keyrings/ 
 if curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+    #-s: убрать лишний вывод.
+    #-f: чтобы скрипт завершился с ошибкой при проблемах загрузки.
+    #-L: следовать за редиректами (например, если сайт перенаправляет на другую страницу).
+    #-S: даже если используется флаг -s (который отключает вывод в стандартный поток). Вместо того, чтобы молчать при ошибках, -S заставляет curl выводить сообщения об ошибках, если что-то пойдет не так, например, проблемы с подключением или загрузкой.
+
    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
    sudo apt update && \
@@ -73,21 +80,27 @@ fi
 # Установка kubectl
 # В отличие от K3S, K3D не устанавливает kubectl по умолчанию
 echo -e "${YELLOW}Installing Kubectl...${RESET}"
-if curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"; then
+curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+
+#Добавлена проверка подлинности kubectl перед установкой.
+echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+if [ $? -eq 0 ]; then
     chmod +x kubectl && \
     sudo mv kubectl /usr/local/bin/ && \
     echo -e "${GREEN}Installing Kubectl was SUCCESSFUL${RESET}"
 else
-    echo -e "${RED}Installing Kubectl FAILED${RESET}"
+    echo -e "${RED}SHA256 check failed! Kubectl installation aborted.${RESET}"
+    exit 1 #Ошибка в SHA256 останавливает скрипт (exit 1), предотвращая установку поврежденного или подмененного бинарника.
 fi
 
 
 
 
-# (опционально) Установка helm
+# (опционально для бонуса) Установка helm
 #curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-echo "Все нужные компоненты установлены! Перезайди в терминал или используй 'newgrp docker' для активации docker-группы."
-
+echo -e "${YELLOW}Все нужные компоненты установлены! Перезайди в терминал или используй 'newgrp docker' для активации docker-группы.${RESET}"
 
 echo -e "${GREEN}INSTALLATION BLOCK OF SOFTWARE COMPLETED SUCCESSFULLY.${RESET}"
