@@ -14,9 +14,9 @@ RESET="\033[0m"
 
 
 # init wil-app
-# подключение конфиг файла
-#ArgoCD сам подтянет проект из Git и задеплоит
-sudo kubectl apply -f ../confs/deploy.yaml
+# подключение конфиг файла (манифеста ArgoCD)
+# В манифесте ArgoCD  уже указан путь на манифест приложения на Git. Он подтянет проект из Git и задеплоит
+sudo kubectl apply -f ../confs/argocdmanifest.yaml
 
 
 

@@ -3,6 +3,10 @@
 GREEN="\033[32m"
 RED="\033[31m"
 RESET="\033[0m"
+#This script is run after the installing all the neccessary soft: Docker, K3d ...
+#Here we make cluster, apply argocd crds, create namespaces, apply ArgoCD manifest with resources: Deployment, Service, ConfigMap и т. д.
+# add entry to etc/host, wait pods to be raised, generate secret path and user (admin)
+
 
 
 #creating cluster
@@ -12,15 +16,26 @@ RESET="\033[0m"
 sudo k3d cluster create areggieS
 
 
+
+
+
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/crds.yaml
+
+
+
+
 
 # https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 # creating namespaces: argocd and dev
 sudo kubectl create namespace argocd && sudo kubectl create namespace dev
 
+
+
+
+
 # https://argo-cd.readthedocs.io/en/stable/
 #Argo CD рекомендуется ставить в namespace argocd:
-#kubectl get pods -n argocd (command to check)
+    #kubectl get pods -n argocd (command to check)
 #команда для развёртывания Argo CD в Kubernetes.
 #Скачивает манифест install.yaml с GitHub-репозитория Argo CD.
 #Применяет этот манифест в Kubernetes в пространстве имён argocd.
@@ -38,8 +53,8 @@ sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-
       #kubectl get svc -n argocd
 
 #После установки Argo CD UI можно будет открыть через порт-форвардинг:
-#kubectl port-forward svc/argocd-server -n argocd 8080:443
-#И затем зайти в браузере: https://localhost:8080
+    #kubectl port-forward svc/argocd-server -n argocd 8080:443
+    #И затем зайти в браузере: https://localhost:8080
 
 
 
@@ -48,10 +63,9 @@ sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-
 
 
 #adding entry to  etc/host 
-#Открывай в браузере: https://localhost:8080
+#Открывай в браузере: https://localhost:8080 или по argocd.mydomain.com:8080
 HOST_ENTRY="127.0.0.1 argocd.mydomain.com"
 HOSTS_FILE="/etc/hosts"
-
 
 #-q (--quiet) — тихий режим, при котором grep не выводит результат в консоль.
 # Он только проверяет, есть ли совпадение, и возвращает код выхода (0 = найдено, 1 = не найдено).
@@ -64,11 +78,15 @@ fi
 #-a (--append) — добавляет (append) текст в конец файла вместо перезаписи.
 #Без -a, tee перезаписал бы весь файл, удалив существующие строки.
 
+#Если ты хочешь доступ из других машин в сети, этого недостаточно.
+#В таком случае тебе нужен полноценный DNS-запись + настройка ingress-контроллера в Kubernetes.
+
 
 
 
 # waitpod
-#Ожидает, пока все поды в пространстве имён argocd не будут в состоянии ready.
+#Ожидает, пока все поды в пространстве имён argocd не будут в состоянии Ready.
+#но если они поднимутся раньше, ожидание сразу завершится.
 #Время ожидания ограничено 600 секунд (10 минутами).
 #Если все поды не станут готовы за это время, команда завершится с ошибкой.
 
@@ -101,21 +119,28 @@ echo -n "${GREEN}ARGOCD PASSWORD : "
 
 
 
-#Доступ к ArgoCD UI:
-#Forward порт:
-#команда выполняет перенаправление портов для доступа к сервису Argo CD, при этом вывод и ошибки перенаправляются в фоновый режим.
-#argocd localhost:8085 or argocd.mydomain.com:8085
+
+#argocd localhost:8080 or argocd.mydomain.com:8080
+
+# Эта команда перенаправляет локальный порт 8080 (на компьютере, откуда выполняется команда)  
+# на порт 443 ArgoCD сервера (UI ArgoCD) внутри кластера Kubernetes.  
+# Это позволяет открыть веб-интерфейс ArgoCD в браузере по адресу https://localhost:8080  
+# и работать с ним, как если бы он был запущен локально.
+
+
 sudo kubectl port-forward svc/argocd-server -n argocd 8080:443 > /dev/null 2>&1 &
+#номер порта можно менять (на любой нужный)
 #kubectl port-forward — используется для перенаправления портов с локальной машины на сервис в Kubernetes.
 #svc/argocd-server — указывает на сервис argocd-server в Kubernetes, который обычно управляет доступом к UI Argo CD.
 #-n argocd — указывает пространство имён argocd, где находится сервис argocd-server.
-#8085:443 — локальный порт 8085 будет перенаправлен на порт 443 сервиса (порт HTTPS).
+#8080:443 — локальный порт 8080 будет перенаправлен на порт 443 сервиса (порт HTTPS).
 #> /dev/null 2>&1
 #> /dev/null — перенаправляет стандартный вывод (stdout) в /dev/null, то есть скрывает его (не будет выводиться информация о процессе).
 #2>&1 — перенаправляет ошибки (stderr) в тот же поток, что и стандартный вывод (в данном случае в /dev/null), так что ошибки также не будут выводиться
+#при этом вывод и ошибки перенаправляются в фоновый режим.
 #& — запускает команду в фоновом режиме. Это позволяет командной строке сразу вернуть контроль, не дожидаясь завершения выполнения команды.
 
 
-#Вы можете получить доступ к Argo CD UI, открыв браузер по адресу http://localhost:8085.
+#Вы можете получить доступ к Argo CD UI, открыв браузер по адресу http://localhost:8080 милм по argocd.mydomain.com:8080
 #Вывод и ошибки команды скрыты (они не будут отображаться в терминале).
 #Команда выполняется в фоновом режиме, позволяя вам продолжать работать в терминале, не дожидаясь завершения перенаправления.

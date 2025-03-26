@@ -134,6 +134,6 @@ fi
 #(опционально для бонуса) Установка helm
 #curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-echo -e "${YELLOW}Все нужные компоненты установлены! Перезайди в терминал или используй 'newgrp docker' для активации docker-группы.${RESET}"
+echo -e "${YELLOW}Все нужные компоненты установлены! Перезайди в систему или используй 'newgrp docker' для активации docker-группы.${RESET}"
 
 echo -e "${GREEN}INSTALLATION BLOCK OF SOFTWARE COMPLETED SUCCESSFULLY.${RESET}"
