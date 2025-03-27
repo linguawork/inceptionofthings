@@ -61,7 +61,7 @@ fi
 # https://docs.k3s.io/quick-start
 
 #папка проекта на хосте с таким же содержимым как на VM (cd to /vagrant)
-if sudo cat /var/lib/rancher/k3s/server/token >> /vagrant/token.env; then
+if sudo cat /var/lib/rancher/k3s/server/token > /vagrant/token.env; then
     echo -e "${GREEN}TOKEN SUCCESSFULLY SAVED${RESET}"
 else
     echo -e "${RED}TOKEN SAVING FAILED${RESET}"
