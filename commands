@@ -1,0 +1,32 @@
+PART1
+
+virtualbox --version
+vboxmanage --version
+#after installing vagrant and vagrant up
+
+vagrant global-status #in any folder
+vagrant ssh (servername, worker name)
+kubectl get nodes
+kubectl get nodes -o wide
+ip a show
+ip a show eth1 #this will run as ifconfig eth1
+sudo systemctl status k3s
+ping 192.168.56.111 #from guest and host
+vagrant status
+sudo systemctl status k3-agent #in worker
+
+PART2
+vagrant ssh
+ ip a show eth1
+kubectl get all #(lists all Kubernetes resources in the current namespace, including:Pods, Services, Deployments, ReplicaSets)
+kubectl get cm #in nosterme version he uses ConfigMap: retrieves all ConfigMaps in the current Kubernetes namespace.
+kubectl get ingress apps
+kubectl describe ingress apps # Ingress Class:    traefik
+kubectl describe service app
+
+das:https://kubernetes.io/docs/concepts/configuration/configmap/
+https://kubernetes.io/docs/concepts/storage/volumes/
+https://kubernetes.io/docs/concepts/services-networking/service/
+traefik
+
+PART3
