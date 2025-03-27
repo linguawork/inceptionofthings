@@ -14,7 +14,7 @@ metadata:
   name: wil-app #Имя ArgoCD-приложения.
   namespace: argocd #Размещается в пространстве имен Argo CD.
 spec:  #Spec: Описывает желаемое состояние объекта. https://foxutech.medium.com/argo-cd-projects-and-examples-5b5c9b84cc36
-  project: default #Every application belongs to a single project. If unspecified, an application belongs to the default project, which is created automatically and by default, permits deployments from any source repo, to any cluster, and all resource Kinds. Адрес server: НЕ зависит от project:.Проект (project:) может разрешать деплой в несколько кластеров, но в самом Application ты должен явно указывать нужный server:
+  project: development #Every application belongs to a single project. If unspecified, an application belongs to the default project, which is created automatically and by default, permits deployments from any source repo, to any cluster, and all resource Kinds. Адрес server: НЕ зависит от project:.Проект (project:) может разрешать деплой в несколько кластеров, но в самом Application ты должен явно указывать нужный server:
   source:  #Источник манифестов:
     repoURL: https://github.com/linguawork/areggie #Git-репозиторий, где хранятся манифесты.
     targetRevision: HEAD # Используется последняя версия (HEAD). Last commit УДАЛЕННОГО РЕПО. В большинстве случаев HEAD означает последний коммит в указанной ветке, но его можно двигать, и в определённых ситуациях он может указывать на более старый коммит. Если хочешь зафиксировать конкретное состояние, лучше указывать хеш коммита вместо HEAD.
