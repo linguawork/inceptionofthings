@@ -16,7 +16,7 @@ RESET="\033[0m"
 # /vagrant is the synced folder, meaning it’s shared between host and VM, so the worker VM can access it.
 # --node-ip=192.168.56.111: Sets the worker’s IP address explicitly.
 
-if export INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 -t $(cat /vagrant/token.env) --node-ip=192.168.56.111"; then
+if export INSTALL_K3S_EXEC="agent --server https://192.168.56.110:6443 -t $(cat /vagrant/token) --node-ip=192.168.56.111"; then
         echo -e "${GREEN}export INSTALL_K3S_EXEC SUCCEEDED${RESET}"
 else
         echo -e "${RED}export INSTALL_K3S_EXEC FAILED${RESET}"
